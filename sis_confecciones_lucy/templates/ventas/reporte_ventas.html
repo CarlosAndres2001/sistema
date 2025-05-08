@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Reporte de Ventas
+{% endblock %}
+
+{% block content %}
+<form id="form-ventas" action="{% url 'lista_ventas' %}" method="post">
+    {% csrf_token %}
+
+    <div>
+        <h2 class="text-center my-4">Reporte de Ventas</h2>
+        
+        <form method="get" class="mb-4">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <label for="fecha_desde" class="form-label me-2">Fecha desde:</label>
+                    <input type="date" id="fecha_desde" name="fecha_desde" class="form-control" value="{{ fecha_desde }}">
+                </div>
+                <div class="me-3">
+                    <label for="fecha_hasta" class="form-label me-2">Fecha hasta:</label>
+                    <input type="date" id="fecha_hasta" name="fecha_hasta" class="form-control" value="{{ fecha_hasta }}">
+                </div>
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+            </div>
+        </form>
+        
+        <br><br>
+        <div class="table-responsive">
+            <table id="tabla-ventas" class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th></th>
+                        <th>ID</th>
+                        <th>Fecha</th>
+                        <th>Monto Total</th>
+                        <th>Vendedor</th>
+                        <th>Precio Venta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for venta in ventas %}
+                        <tr data-corte-100="{{ venta.corte_100 }}"
+                            data-corte-50="{{ venta.corte_50 }}"
+                            data-corte-20="{{ venta.corte_20 }}"
+                            data-corte-10="{{ venta.corte_10 }}"
+                            data-corte-5="{{ venta.corte_5 }}"
+                            data-corte-1="{{ venta.corte_1 }}">
+                            <td class="details-control">➕</td>
+                            <td>{{ venta.id_operacion }}</td>
+                            <td>{{ venta.fecha }}</td>
+                            <td>{{ venta.total_calculado }}</td>
+                            <td>{{ venta.id_usuario }}</td>
+                            <td>{{ venta.precio_venta }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                
+            </table>
+        </div>
+    </div>
+</form>
+<script>
+    $(document).ready(function () {
+        // Asegúrate de destruir la tabla solo una vez para evitar reinicialización
+        let table = $('#tabla-ventas');
+
+        if ($.fn.dataTable.isDataTable('#tabla-ventas')) {
+            table.DataTable().clear().destroy();  // Limpiar y destruir
+        }
+
+        // Inicializar la tabla
+        table = $('#tabla-ventas').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+            },
+            dom:
+                "<'row mb-3'" +
+                    "<'col-sm-6 d-flex align-items-center'f>" +  <!-- Buscador a la izquierda -->
+                    "<'col-sm-6 d-flex justify-content-end'B>" +  <!-- Botones a la derecha -->
+                ">" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row mt-3'" +
+                    "<'col-sm-6'i>" +                         <!-- Información de registros -->
+                    "<'col-sm-6 d-flex justify-content-end'l>" + <!-- Selector al final a la derecha -->
+                ">" +
+                "<'row'" +
+                    "<'col-sm-12 text-end'p>" +              <!-- Paginación -->
+                ">",
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    className: 'btn btn-secondary btn-sm me-1',
+                    text: 'Copiar'
+                },
+                {
+                    extend: 'excelHtml5',
+                    className: 'btn btn-success btn-sm me-1',
+                    text: 'Excel'
+                },
+                {
+                    extend: 'pdfHtml5',
+                    className: 'btn btn-danger btn-sm me-1',
+                    orientation: 'landscape',
+                    pageSize: 'A4',
+                    exportOptions: { columns: ':visible' },
+                    text: 'PDF'
+                },
+                {
+                    extend: 'print',
+                    className: 'btn btn-info btn-sm',
+                    text: 'Imprimir'
+                }
+            ],
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+        });
+
+        // Función para mostrar los detalles de los billetes
+        function format(rowData) {
+            return `
+                <table class="table table-sm table-bordered mb-0">
+                    <thead><tr><th>Billete</th><th>Cantidad</th></tr></thead>
+                    <tbody>
+                        ${rowData.corte100 > 0 ? `<tr><td>100 Bs</td><td>${rowData.corte100}</td></tr>` : ''}
+                        ${rowData.corte50 > 0 ? `<tr><td>50 Bs</td><td>${rowData.corte50}</td></tr>` : ''}
+                        ${rowData.corte20 > 0 ? `<tr><td>20 Bs</td><td>${rowData.corte20}</td></tr>` : ''}
+                        ${rowData.corte10 > 0 ? `<tr><td>10 Bs</td><td>${rowData.corte10}</td></tr>` : ''}
+                        ${rowData.corte5 > 0 ? `<tr><td>5 Bs</td><td>${rowData.corte5}</td></tr>` : ''}
+                        ${rowData.corte1 > 0 ? `<tr><td>1 Bs</td><td>${rowData.corte1}</td></tr>` : ''}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Agregar funcionalidad de expandir detalles de billetes al hacer clic
+        $('#tabla-ventas tbody').on('click', 'td.details-control', function () {
+            const tr = $(this).closest('tr');
+            const row = table.row(tr);
+
+            // Verificar si la fila ya está expandida
+            if (row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                $(this).html('➕'); // Cambiar icono a "+"
+            } else {
+                const corteData = {
+                    corte100: tr.data('corte-100'),
+                    corte50: tr.data('corte-50'),
+                    corte20: tr.data('corte-20'),
+                    corte10: tr.data('corte-10'),
+                    corte5: tr.data('corte-5'),
+                    corte1: tr.data('corte-1'),
+                };
+                row.child(format(corteData)).show();
+                tr.addClass('shown');
+                $(this).html('➖'); // Cambiar icono a "-"
+            }
+        });
+    });
+</script>
+
+<style>
+    td.details-control {
+        cursor: pointer;
+        text-align: center;
+        font-size: 18px;
+    }
+    tr.shown td.details-control {
+        font-weight: bold;
+        color: red;
+    }
+</style>
+{% endblock %}

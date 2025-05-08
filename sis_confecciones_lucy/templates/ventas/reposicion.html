@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Gestión de Reposiciones
+{% endblock %}
+
+{% block content %}
+    <h1>Gestión de Reposiciones</h1>
+    <form id="form-reposicion" action="{% url 'ventas_reposicion' %}" method="post">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <th><label for="producto">Producto:</label></th>
+                <th><label for="cantidad">Cantidad:</label></th>
+            </tr>
+            <tr>
+                <td><input type="text" name="producto" id="producto" class="form-control" placeholder="Producto"></td>
+                <td><input type="number" name="cantidad" id="cantidad" class="form-control" placeholder="Cantidad"></td>
+            </tr>
+            <tr>
+                <th><label for="fecha">Fecha:</label></th>
+                <th><label for="estado">Estado:</label></th>
+            </tr>
+            <tr>
+                <td><input type="date" name="fecha" id="fecha" class="form-control"></td>
+                <td>
+                    <select name="estado" class="form-select" aria-label="Default select example">
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Completada">Completada</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">Registrar Reposición</button>
+            <button type="reset" class="btn btn-danger">Cancelar</button>
+        </div>
+    </form>
+
+    <div class="notification success" id="success-message">{{ message }}</div>
+    <div class="notification error" id="error-message">{{ error }}</div>
+
+{% endblock %}

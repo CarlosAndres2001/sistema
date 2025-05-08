@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+
+    <h1 align="center">Formulario de registro de Productos</h1>
+</br>
+    <form method="POST" id="form_producto">
+        {% csrf_token %}
+        <table class="table table-bordered">
+            <tr>
+                <td><label for="nombre_producto">Nombre del Producto:</label></td>
+                <td><label for="costo">Costo:</label></td>
+                
+            </tr>
+            <tr>
+                <td><input type="text" name="nombre_producto" id="nombre_producto" class="form-control" required></td>
+                <td><input type="number" name="costo" id="costo" class="form-control" step="0.01"></td>
+            </tr>
+            <tr>
+                <td><label for="precio_venta">Precio de Venta:</label></td>
+                <td><label for="id_subcategoria">Subcategoría:</label></td>
+                
+            </tr>
+            <tr>
+                <td><input type="number" name="precio_venta" id="precio_venta" class="form-control" step="0.01"></td>
+                <td>
+                    <select name="id_subcategoria" id="id_subcategoria" class="form-control" required>
+                        <option value="" disabled selected>Seleccione una subcategoría</option>
+                        {% for subcategoria in subcategorias %}
+                        <option value="{{ subcategoria.id_subcategoria }}">{{ subcategoria.nombre_subcategoria }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="unida_medida">Unidad de Medida:</label></td>
+                <td><label for="estado">Estado:</label></td>
+            </tr>
+            <tr>
+                <td>
+                    <select name="unida_medida" id="unida_medida" class="form-control">
+                        <option value="" disabled selected>Seleccione una unidad</option>
+                        <option value="metro">Metro</option>
+                        <option value="unidad">Unidad</option>
+                        <option value="centimetros">Centímetros</option>
+                        <option value="rollo">Rollo</option>
+                        <option value="tubo">Tubo P</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="estado" id="estado" class="form-control">
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                    </select>
+                </td>
+            </tr>
+        </table>        
+        <h2 align="center">Insumos Para la Producción del Producto</h2>
+        <table class="table" id="tabla_insumos">
+            <thead>
+                <tr>
+                    <th>Insumo</th>
+                    <th>Cantidad</th>
+                    <th>Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <select name="insumo_0" class="form-control">
+                            <option value="" disabled selected>Seleccione un insumo</option>
+                            {% for insumo in insumos %}
+                            <option value="{{ insumo.id_insumo }}">{{ insumo.nombre_insumo }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" name="cantidad_0" class="form-control" step="0.01" placeholder="Cantidad">
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger" onclick="removeInsumoRow(this)">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button type="button" class="btn btn-success" onclick="agregarFila()">Agregar Insumo</button>
+        <button type="submit" class="btn btn-primary">Crear Producto</button>
+        <button type="button" class="btn btn-secondary" onclick="cancelarFormulario()">Cancelar</button>
+    </form>
+</div>
+
+<script>
+    let insumoIndex = 1;  
+
+    function agregarFila() {
+        var tabla = document.getElementById("tabla_insumos").getElementsByTagName('tbody')[0];
+        var nuevaFila = tabla.insertRow();
+    
+        var celda1 = nuevaFila.insertCell(0);
+        celda1.innerHTML = `
+            <select name="insumo_${insumoIndex}" class="form-control">
+                <option value="" disabled selected>Seleccione un insumo</option>
+                {% for insumo in insumos %}
+                <option value="{{ insumo.id_insumo }}">{{ insumo.nombre_insumo }}</option>
+                {% endfor %}
+            </select>
+        `;
+    
+        var celda2 = nuevaFila.insertCell(1);
+        celda2.innerHTML = `<input type="number" name="cantidad_${insumoIndex}" step="0.01" placeholder="Cantidad" class="form-control">`;
+    
+        var celda3 = nuevaFila.insertCell(2);
+        celda3.innerHTML = `
+            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button>
+        `;
+    
+        insumoIndex++;
+    }
+    
+    function eliminarFila(boton) {
+        var fila = boton.parentNode.parentNode;
+        var tabla = document.getElementById("tabla_insumos").getElementsByTagName('tbody')[0];
+    
+        if (tabla.rows.length > 1) {
+            fila.parentNode.removeChild(fila);
+            insumoIndex--;
+        } else {
+            alert("Debe haber al menos una fila de insumo.");
+        }
+    }
+    
+    function cancelarFormulario() {
+        document.getElementById("form_producto").reset();
+    
+        var tabla = document.getElementById("tabla_insumos").getElementsByTagName('tbody')[0];
+        tabla.innerHTML = ''; 
+    
+        insumoIndex = 1;  // Restablecer el índice para que las filas nuevas comiencen desde 0
+        agregarFila();
+    }
+    
+</script>
+{% if messages %}
+<div class="mt-3">
+    {% for message in messages %}
+    <div class="alert {{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+<script>
+        
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        const alert = document.querySelector('.alert');
+
+        
+        if (alert) {
+            setTimeout(function() {
+                alert.classList.remove('show'); 
+            }, 5000); 
+        }
+    });
+</script>
+{% endblock %}

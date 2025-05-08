@@ -1,0 +1,200 @@
+/* RESET Y BASE */
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* evita scroll general */
+    font-family: 'Poppins', sans-serif;
+}
+
+/* NAVBAR FIJA SUPERIOR */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 250px; /* deja espacio al sidebar */
+    right: 0;
+    height: 70px;
+    background-color: #064D94;
+    color: rgb(243, 239, 239);
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    z-index: 9999;
+    /*padding-left: 60px;*/
+    transition: left 0.3s ease;
+}
+@media (max-width: 768px) {
+    .navbar {
+      left: 0; /* ocupa todo el ancho en móviles */
+      width: 100%;
+    }
+  }
+.navbar.expanded {
+    left: 0 !important;
+}
+
+/* SIDEBAR FIJA CON SCROLL OCULTO */
+.sidebar {
+    position: fixed;
+    top: 0x; /* debajo de la navbar */
+    left: 0;
+    width: 250px;
+    height: calc(100vh - 56px);
+    background-color: #064d94;
+    color: white;
+    overflow-y: auto;
+    padding: 0;
+    margin: 0;
+    border: none;
+    box-shadow: none;
+    z-index: 1000;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE 10+ */
+}
+.sidebar.collapsed {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.content.expanded {
+    margin-left: 0;
+    transition: margin-left 0.3s ease;
+}
+
+.sidebar::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+/* SECCIÓN SUPERIOR FIJA DENTRO DE SIDEBAR */
+.sidebar .top-box {
+    position: sticky;
+    top: 0;
+    background-color: #064d94;
+    z-index: 1001;
+    padding: 20px 0;
+}
+
+.sidebar .top-box h1 {
+    font-size: 22px;
+    text-align: center;
+    font-weight: 400;
+    color: #f2f3f4;
+    margin-bottom: 30px;
+}
+
+/* ACORDEÓN Y LINKS */
+.sidebar .accordion-button {
+    font-weight: 600;
+    background: linear-gradient(135deg, #055aaf, #0c0c0c);
+    color: #e6eaf0;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.sidebar .accordion-button:hover,
+.sidebar .accordion-button:not(.collapsed) {
+    background-color: #080215;
+    color: #fbfbfb;
+}
+
+.sidebar .accordion-body {
+    font-size: 14px;
+    padding: 10px 20px;
+}
+
+.sidebar a {
+    display: block;
+    padding: 10px 15px;
+    color: #1b1919;
+    text-decoration: none;
+    font-size: 16px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background-color: #070820;
+    border-radius: 4px;
+    color: #dee2e6;
+}
+
+/* CONTENIDO PRINCIPAL */
+.content {
+    margin-left: 250px;
+    margin-top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .sidebar {
+      left: -250px; /* oculto fuera de la pantalla */
+      transition: left 0.3s ease;
+      width: 250px;
+      z-index: 1000;
+    }
+  
+    .sidebar.show {
+      left: 0; /* mostrar sidebar */
+    }
+  
+    .content,
+    .navbar {
+      margin-left: 0 !important; /* sin margen en móviles */
+    }
+  }
+  
+
+/* ESTILOS EXTRA QUE USAS */
+#proveedor_list, #insumo_list,
+.resultadosInsumos {
+    position: absolute;
+    width: 100%;
+    z-index: 999;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#usuario-nombre {
+    margin-left: auto;
+    padding-right: 20px;
+}
+
+.list-group-item {
+    cursor: pointer;
+}
+
+.list-group-item:hover {
+    background-color: #f1f1f1;
+}
+
+.form-group.compact {
+    display: inline-block;
+    width: auto;
+}
+
+.form-group.compact .form-control {
+    display: inline-block;
+    width: auto;
+}
+
+.corte-input {
+    width: 70px;
+    text-align: center;
+    margin: 0 auto;
+    display: block;
+}
+
+
+#desglose {
+    white-space: pre-wrap;
+    font-family: monospace;
+    min-height: 50px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}

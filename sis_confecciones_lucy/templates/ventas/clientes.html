@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Registro de Clientes
+{% endblock %}
+
+{% block content %}
+<h2 class="text-center my-4">Registro de Clientes</h2>
+
+<form id="cliente-form" action="{% url 'registrar_cliente' %}" method="post">
+    {% csrf_token %}
+    
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="nombre" class="form-label">Nombre / Razón Social</label>
+            <input type="text" name="nombre" id="nombre" class="form-control" placeholder="Nombre o Razón Social">
+        </div>
+        <div class="col-md-6">
+            <label for="nit" class="form-label">NIT / CI</label>
+            <input type="text" name="nit" id="nit" class="form-control" placeholder="NIT o Cédula de Identidad">
+        </div>
+        <div class="col-md-6">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input type="text" name="telefono" id="telefono" class="form-control" placeholder="Número telefónico">
+        </div>
+        <div class="col-md-6">
+            <label for="estado" class="form-label">Estado</label>
+            <select name="estado" id="estado" class="form-select">
+                <option value="Activo">Activo</option>
+                <option value="Inactivo">Inactivo</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
+        <button type="submit" class="btn btn-primary">Registrar Cliente</button>
+        <button type="reset" class="btn btn-danger">Cancelar</button>
+        <a href="{% url 'lista_clientes' %}" class="btn btn-secondary">Ver Clientes Registrados</a>
+    </div>
+</form>
+{% if messages %}
+    <div class="alert alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</form>
+<script>
+        
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        const alert = document.querySelector('.alert');
+
+        
+        if (alert) {
+            setTimeout(function() {
+                alert.classList.remove('show'); 
+            }, 5000); 
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('cliente-form');
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+
+        form.addEventListener('submit', function (event) {
+            let camposVacios = false;
+
+            const inputs = form.querySelectorAll('input, select');
+            inputs.forEach(function (input) {
+                if (input.value.trim() === '') {
+                    camposVacios = true;
+                    input.classList.add('is-invalid'); 
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            });
+
+            if (camposVacios) {
+                event.preventDefault(); 
+                errorMessage.style.display = 'block'; 
+                errorMessage.textContent = 'Por favor, complete todos los campos requeridos.';
+                successMessage.style.display = 'none'; 
+            }
+        });
+    });
+</script>
+{% endblock %}

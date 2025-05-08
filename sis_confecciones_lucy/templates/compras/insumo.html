@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1 align="center">Formulario de Creación de Insumos</h1>
+
+</br></br></br>
+  <form id="insumo-form" action="{% url 'crear_insumo' %}" method="post">
+    {% csrf_token %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Nombre del Insumo</th>
+          <th>Descripción</th>
+          <th>Unidad de Medida</th>
+          <th>Color</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input type="text" name="nombre_insumo" id="nombre_insumo" class="form-control" required style="text-transform: uppercase;"></td>
+          <td><input type="text" name="descripcion" id="descripcion" class="form-control" style="text-transform: uppercase;" required></td>
+          <td>
+            <select name="unidad_medida" id="unidad_medida" class="form-control">
+                <option value="" disabled selected>Seleccione una unidad</option>
+                <option value="metro">Metro</option>
+                <option value="unidad">Unidad</option>
+                <option value="centimetros">Centímetros</option>
+                <option value="rollo">Rollo</option>
+                <option value="tubo">Tubo P</option>
+            </select>
+        </td>
+          <td>
+            <select name="color" id="color" class="form-control" style="text-transform: uppercase;">
+              <option value="red">Rojo</option>
+              <option value="blue">Azul</option>
+              <option value="green">Verde</option>
+              <option value="yellow">Amarillo</option>
+              <option value="orange">Naranja</option>
+              <option value="purple">Púrpura</option>
+              <option value="pink">Rosa</option>
+              <option value="brown">Marrón</option>
+              <option value="black">Negro</option>
+              <option value="white">Blanco</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>  </br>
+  </br>  
+    <div style="text-align: center;">
+      <button type="submit" class="btn btn-primary">Crear Insumo</button>
+      <button type="button" class="btn btn-secondary" onclick="limpiarCampos()">Cancelar</button>
+    </div>    
+  </form>
+{% if messages %}
+  <div class="alert alert-dismissible fade show" role="alert">
+      {% for message in messages %}
+          <div class="alert {{ message.tags }}">
+              {{ message }}
+          </div>
+      {% endfor %}
+  </div>
+{% endif %}
+<script>
+      
+  document.addEventListener("DOMContentLoaded", function() {
+      
+      const alert = document.querySelector('.alert');
+      if (alert) {
+          setTimeout(function() {
+              alert.classList.remove('show'); 
+          }, 5000); 
+      }
+  });
+</script>
+  <script>
+    function limpiarCampos() {
+      document.getElementById('insumo-form').reset(); 
+    }
+    
+    document.addEventListener("DOMContentLoaded", function() {
+      const alert = document.querySelector('.alert');
+
+      if (alert) {
+        setTimeout(function() {
+          alert.classList.remove('show'); 
+        }, 4000); 
+      }
+    });
+  </script>
+  
+{% endblock %}

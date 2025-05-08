@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar Solicitud de Compra{% endblock %}
+
+{% block content %}
+<h1 align="center">Registrar Solicitud de Compra</h1>
+</br> </br> 
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group compact" style="display: flex; justify-content: center; align-items: center;">
+            <label for="fecha">Fecha:</label>
+            <input type="date" id="fecha" name="fecha" class="form-control" style="width: auto;" required>
+        </div>            
+        </br>   
+        </br> 
+        <h2 align="center">Detalles de la solicitud</h2>
+    </br>   
+</br> 
+        <table id="detalle-solicitud" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Insumo</th>
+                    <th>Cantidad</th>
+                    <th>Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input type="text" id="buscarInsumo" class="form-control" placeholder="Buscar insumo por nombre">
+                        <div id="resultadosInsumos" class="list-group mt-1" style="position: absolute; z-index: 10;"></div>
+                        <input type="hidden" name="id_insumo[]" id="insumoSeleccionado">
+                    </td>
+                    <td>
+                        <input type="number" name="cantidad[]" class="form-control" min="1" required>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger" onclick="eliminarFila(this)">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>            
+        </table>      
+        <div class="form-group mt-4" align="center">
+            <button type="button" class="btn btn-primary" onclick="agregarFila()">Agregar Insumo</button>
+            <button type="submit" class="btn btn-success">Guardar Solicitud</button>
+        </div>
+
+    </form>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+<script>
+    let filaCounter = 0; 
+    function agregarFila() {
+        const table = document.getElementById('detalle-solicitud').getElementsByTagName('tbody')[0];
+        filaCounter++; 
+        const row = table.insertRow();
+
+        const buscarInsumoId = `buscarInsumo-${filaCounter}`;
+        const resultadosInsumosId = `resultadosInsumos-${filaCounter}`;
+        const insumoSeleccionadoId = `insumoSeleccionado-${filaCounter}`;
+
+        row.innerHTML = `
+            <td>
+                <input type="text" id="${buscarInsumoId}" class="form-control" placeholder="Buscar insumo por nombre">
+                <div id="${resultadosInsumosId}" class="list-group mt-1" style="position: absolute; z-index: 10;"></div>
+                <input type="hidden" name="id_insumo[]" id="${insumoSeleccionadoId}">
+            </td>
+            <td>
+                <input type="number" name="cantidad[]" class="form-control" min="1" required>
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger" onclick="eliminarFila(this)">Eliminar</button>
+            </td>
+        `;
+
+        configurarBusquedaInsumo(buscarInsumoId, resultadosInsumosId, insumoSeleccionadoId);
+    }
+
+    function configurarBusquedaInsumo(buscarInsumoId, resultadosInsumosId, insumoSeleccionadoId) {
+        const inputInsumo = document.getElementById(buscarInsumoId);
+        const resultadosInsumos = document.getElementById(resultadosInsumosId);
+        const insumoSeleccionado = document.getElementById(insumoSeleccionadoId);
+
+        inputInsumo.addEventListener('input', function () {
+            const query = inputInsumo.value;
+            if (query.length >= 1) {
+                fetch(`/compras/solicitud_compra/?q=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        resultadosInsumos.innerHTML = '';
+                        if (data.insumos.length > 0) {
+                            data.insumos.forEach(insumo => {
+                                const item = document.createElement('button');
+                                item.type = 'button';
+                                item.className = 'list-group-item list-group-item-action';
+                                item.textContent = insumo.nombre_insumo;
+                                item.addEventListener('click', () => {
+                                    inputInsumo.value = insumo.nombre_insumo;
+                                    insumoSeleccionado.value = insumo.id_insumo;
+                                    resultadosInsumos.innerHTML = '';
+                                });
+                                resultadosInsumos.appendChild(item);
+                            });
+                        } else {
+                            resultadosInsumos.innerHTML = '<div class="list-group-item">No se encontraron insumos</div>';
+                        }
+                    });
+            } else {
+                resultadosInsumos.innerHTML = '';
+            }
+        });
+    }
+
+    function eliminarFila(button) {
+        const row = button.closest('tr');
+        const table = document.getElementById('detalle-solicitud').getElementsByTagName('tbody')[0];
+
+        if (table.rows.length > 1) {
+            row.remove();
+        } else {
+            alert('Debe haber al menos un insumo en la solicitud. No puedes eliminar todas las filas.');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const fechaInput = document.getElementById('fecha');
+        const hoy = new Date();
+        const year = hoy.getFullYear();
+        const month = String(hoy.getMonth() + 1).padStart(2, '0'); 
+        const day = String(hoy.getDate()).padStart(2, '0'); 
+        fechaInput.value = `${year}-${month}-${day}`;
+
+        configurarBusquedaInsumo('buscarInsumo', 'resultadosInsumos', 'insumoSeleccionado');
+    });
+</script>
+
+{% if messages %}
+    <div class="alert alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+<script>
+        
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        const alert = document.querySelector('.alert');
+
+        
+        if (alert) {
+            setTimeout(function() {
+                alert.classList.remove('show'); 
+            }, 5000); 
+        }
+    });
+</script>
+{% endblock %}

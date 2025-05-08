@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 align="center">Gestión de Categorías y Subcategorías</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th><h2>Crear Categoría</h2></th>
+                <th><h2>Crear Subcategoría</h2></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <form method="POST" action="{% url 'crear_categoria' %}">
+                        {% csrf_token %}
+                
+                        <div class="form-group">
+                            <label for="nombre_categoria">Nombre de la Categoría:</label>
+                            <input type="text" name="nombre_categoria" id="nombre_categoria" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-2">Crear Categoría</button>
+                    </form>
+                </td>
+                <td>
+                    <form method="POST" action="{% url 'crear_subcategoria' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="nombre_subcategoria">Nombre de la Subcategoría:</label>
+                            <input type="text" name="nombre_subcategoria" id="nombre_subcategoria" class="form-control" required>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="id_categoria">Seleccionar Categoría:</label>
+                            <select name="id_categoria" id="id_categoria" class="form-control" required>
+                                <option value="" disabled selected>Seleccione una categoría</option>
+                                {% for categoria in categorias %}
+                                <option value="{{ categoria.id_categoria }}">{{ categoria.nombre_categoria }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-2">Crear Subcategoría</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="text-center my-4">
+        <a href="{% url 'listar_categorias' %}" class="btn btn-info">
+            Ver Categorías y Subcategorías existentes
+        </a>
+    </div>
+    
+</div>
+
+{% if messages %}
+<div class="mt-3">
+    {% for message in messages %}
+    <div class="alert {{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+<script>
+        
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        const alert = document.querySelector('.alert');
+
+        
+        if (alert) {
+            setTimeout(function() {
+                alert.classList.remove('show'); 
+            }, 5000); 
+        }
+    });
+</script>
+{% endblock %}

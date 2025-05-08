@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Registro de Clientes
+{% endblock %}
+
+{% block content %}
+<form id="form-cliente" action="{% url 'lista_clientes' %}" method="post">
+    {% csrf_token %}
+    <div>
+        <h2 class="text-center my-4">Clientes Registrados</h2>
+        <a href="{% url 'registrar_cliente' %}" class="btn btn-primary">Nuevo Cliente</a>
+        <br>
+        <br>
+        <div class="table-responsive">
+            <table id="tabla-clientes" class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Nro Documento</th>
+                        <th>Teléfono</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in clientes %}
+                        <tr>
+                            <td>{{ cliente.id_cliente }}</td>
+                            <td>{{ cliente.nombre_cliente }}</td>
+                            <td>{{ cliente.nro_documento }}</td>
+                            <td>{{ cliente.telefono }}</td>
+                            <td>{{ cliente.estado }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</form>
+<script>
+    $(document).ready(function () {
+        $('#tabla-clientes').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+            },
+            dom:
+                "<'row mb-3'" +
+                    "<'col-sm-6 d-flex align-items-center'f>" +  <!-- Buscador a la izquierda -->
+                    "<'col-sm-6 d-flex justify-content-end'B>" +  <!-- Botones a la derecha -->
+                ">" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row mt-3'" +
+                    "<'col-sm-6'i>" +                         <!-- Información de registros -->
+                    "<'col-sm-6 d-flex justify-content-end'l>" + <!-- Selector al final a la derecha -->
+                ">" +
+                "<'row'" +
+                    "<'col-sm-12 text-end'p>" +              <!-- Paginación -->
+                ">",
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    className: 'btn btn-secondary btn-sm me-1',
+                    text: 'Copiar'
+                },
+                {
+                    extend: 'excelHtml5',
+                    className: 'btn btn-success btn-sm me-1',
+                    text: 'Excel'
+                },
+                {
+                    extend: 'pdfHtml5',
+                    className: 'btn btn-danger btn-sm me-1',
+                    orientation: 'landscape',
+                    pageSize: 'A4',
+                    exportOptions: { columns: ':visible' },
+                    text: 'PDF'
+                },
+                {
+                    extend: 'print',
+                    className: 'btn btn-info btn-sm',
+                    text: 'Imprimir'
+                }
+            ],
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+        });
+    });
+</script>
+
+<style>
+    .dt-buttons .btn {
+        margin-right: 5px;
+    }
+</style>
+
+{% endblock %}

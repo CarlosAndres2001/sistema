@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Registrar Pedido
+{% endblock %}
+
+{% block content %}
+<h1 class="text-center">Registro de Pedido</h1>
+<form method="post" class="mt-4">
+    {% csrf_token %}
+    <input type="hidden" name="id_usuario" value="{{ request.user.id_usuario }}">
+
+    <table class="table">
+        <tr>
+            <th><label for="fecha_hora">Fecha y Hora:</label></th>
+            <th><label for="id_cliente">Cliente:</label></th>
+        </tr>
+        <tr>
+            <td>
+                <input type="datetime-local" name="fecha_hora" id="fecha_hora" class="form-control" required>
+            </td>
+            <td>
+                <select name="id_cliente" id="id_cliente" class="form-control" required>
+                    <option value="">Seleccione un cliente</option>
+                    {% for cliente in clientes %}
+                    <option value="{{ cliente.id_cliente }}">{{ cliente.nombre_cliente }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="descuento">Monto de Descuento:</label></th>
+            <th><label for="monto_total">Monto Total:</label></th>
+        </tr>
+        <tr>
+            <td>
+                <input type="number" name="descuento" id="descuento" class="form-control" oninput="calcularMontoTotal()" value="0"  step="0.01" min="0">
+            </td>
+            <td>
+                <input type="number" step="0.01" name="monto_total" id="monto_total" class="form-control" readonly>
+            </td>
+        </tr>
+    </table>
+
+    <h3 align="center">Detalles del Pedido</h3>
+    <table class="table" id="detalles-pedido-table">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody id="detalles-body">
+            <tr>
+                <td>
+                    <select name="id_producto[]" class="form-control producto-select" required onchange="actualizarPrecioUnitario(this)">
+                        <option value="">Seleccione un producto</option>
+                        {% for producto in productos %}
+                        <option value="{{ producto.id_producto }}" data-precio="{{ producto.precio_venta }}">
+                            {{ producto.nombre_producto }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <input type="number" name="cantidad[]" class="form-control cantidad" required oninput="calcularSubtotal(this)">
+                </td>
+                <td>
+                    <input type="number" step="0.01" name="precio_unitario[]" class="form-control precio_unitario" required readonly>
+                </td>
+                <td>
+                    <input type="number" step="0.01" name="subtotal[]" class="form-control subtotal" readonly>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="actions mt-3" align="center">
+        <button type="button" class="btn btn-secondary" onclick="agregarFila()">Agregar Producto</button>
+        <button type="submit" class="btn btn-primary">Registrar Pedido</button>
+        <button type="reset" class="btn btn-danger">Cancelar</button>
+    </div>
+</form>
+<script>
+
+    function actualizarPrecioUnitario(selectElement) {
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const precio = selectedOption.getAttribute('data-precio');
+        const precioUnitarioInput = selectElement.closest('tr').querySelector('.precio_unitario');
+        precioUnitarioInput.value = precio || ''; 
+        calcularSubtotal(selectElement);
+    }
+
+    function calcularSubtotal(element) {
+        const row = element.closest('tr');
+        const cantidad = parseFloat(row.querySelector('.cantidad').value) || 0;
+        const precioUnitario = parseFloat(row.querySelector('.precio_unitario').value) || 0;
+        const subtotalInput = row.querySelector('.subtotal');
+        subtotalInput.value = (cantidad * precioUnitario).toFixed(2);
+        calcularMontoTotal(); 
+    }
+
+    function eliminarFila(button) {
+        const row = button.closest('tr');
+        row.remove();
+        calcularMontoTotal(); 
+    }
+
+    function agregarFila() {
+        const tabla = document.getElementById('detalles-body');
+        const fila = tabla.insertRow();
+        
+        fila.innerHTML = `
+            <tr>
+                <td>
+                    <select name="id_producto[]" class="form-control producto-select" required onchange="actualizarPrecioUnitario(this)">
+                        <option value="">Seleccione un producto</option>
+                        {% for producto in productos %}
+                        <option value="{{ producto.id_producto }}" data-precio="{{ producto.precio_venta }}">
+                            {{ producto.nombre_producto }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <input type="number" name="cantidad[]" class="form-control cantidad" required oninput="calcularSubtotal(this)">
+                </td>
+                <td>
+                    <input type="number" step="0.01" name="precio_unitario[]" class="form-control precio_unitario" required readonly>
+                </td>
+                <td>
+                    <input type="number" step="0.01" name="subtotal[]" class="form-control subtotal" readonly>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button>
+                </td>
+            </tr>
+        `;
+    }
+
+    function calcularMontoTotal() {
+        const filas = document.querySelectorAll('#detalles-body tr');
+        let montoTotal = 0;
+
+        filas.forEach(fila => {
+            const cantidad = parseFloat(fila.querySelector('.cantidad').value) || 0;
+            const precioUnitario = parseFloat(fila.querySelector('.precio_unitario').value) || 0;
+            const subtotal = cantidad * precioUnitario;
+            fila.querySelector('.subtotal').value = subtotal.toFixed(2);
+            montoTotal += subtotal;
+        });
+
+        const descuento = parseFloat(document.getElementById('descuento').value) || 0;
+        const montoTotalFinal = montoTotal - descuento;
+        document.getElementById('monto_total').value = montoTotalFinal.toFixed(2);
+    }
+
+    const fechaHoraInput = document.getElementById('fecha_hora');
+    const now = new Date();
+    fechaHoraInput.value = now.toISOString().slice(0, 16);
+</script>
+{% if messages %}
+    <div class="alert alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</form>
+<script> 
+    document.addEventListener("DOMContentLoaded", function() {    
+        const alert = document.querySelector('.alert');
+        if (alert) {
+            setTimeout(function() {
+                alert.classList.remove('show'); 
+            }, 5000); 
+        }
+    });
+</script>
+{% endblock %}

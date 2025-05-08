@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket de Venta</title>
+    <style>
+        body {
+            font-family: monospace;
+            width: 58mm;
+            padding: 5px;
+        }
+        .ticket {
+            text-align: center;
+        }
+        .ticket hr {
+            border: 1px dashed #000;
+        }
+        .ticket h3 {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body onload="window.print(); window.onafterprint = () => window.location.href = '{% url 'registrar_venta' %}';">
+    <div class="container">
+        <!-- Detalles de la venta -->
+        <div class="card">
+            <div class="card-header">
+                <h4 class="text-center my-4">Venta #{{ venta.id_operacion }}</h4>
+            </div>
+            <div class="card-body">
+                <p><strong>Fecha:</strong> {{ venta.fecha }}</p>
+                
+                <hr>
+                <p><strong>Detalle:</strong></p>
+                    <table style="width:100%; text-align: left;">
+                        <thead>
+                            <tr>
+                                <th>Billetes</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if venta.corte_100 > 0 %}
+                            <tr>
+                                <td>100 Bs</td>
+                                <td>{{ venta.corte_100 }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if venta.corte_50 > 0 %}
+                            <tr>
+                                <td>50 Bs</td>
+                                <td>{{ venta.corte_50 }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if venta.corte_20 > 0 %}
+                            <tr>
+                                <td>20 Bs</td>
+                                <td>{{ venta.corte_20 }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if venta.corte_10 > 0 %}
+                            <tr>
+                                <td>10 Bs</td>
+                                <td>{{ venta.corte_10 }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if venta.corte_5 > 0 %}
+                            <tr>
+                                <td>5 Bs</td>
+                                <td>{{ venta.corte_5 }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if venta.corte_1 > 0 %}
+                            <tr>
+                                <td>1 Bs</td>
+                                <td>{{ venta.corte_1 }}</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                <hr>         
+                <p><strong>Total Calculado:</strong> {{ venta.total_calculado }}</p>
+                <!-- Información de la moneda y el usuario (solo IDs) -->
+                <p><strong>Observaciones:</strong> {{ venta.observaciones }}</p>
+                <p><strong>Moneda:</strong> {{ venta.id_moneda }}</p>
+                <p><strong id="usuario-nombre">Vendedor: {{ request.user }}</strong></p>
+                <p style="display: none;" id="usuario-id">{{ request.user.id_usuario }}</p>
+                <p>Gracias por su compra</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Registrar Compra
+{% endblock %}
+
+{% block content %}
+<h1 class="text-center">Registro de Compra</h1>
+<form method="post" class="mt-4">
+    {% csrf_token %}
+    <input type="hidden" name="id_usuario" value="{{ request.user.id_usuario }}">
+    <table class="table">
+        <tr>
+            <th><label for="fecha_hora">Fecha y Hora:</label></th>
+            <th><label for="id_proveedor">Proveedor:</label></th>
+        </tr>
+        <tr>
+            <td><input type="datetime-local" name="fecha_hora" id="fecha_hora" class="form-control" required></td>
+            <td>
+                <select name="id_proveedor" id="id_proveedor" class="form-control" required>
+                    {% for proveedor in proveedores %}
+                        <option value="{{ proveedor.id_proveedor }}">{{ proveedor.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="monto_total">Monto Total:</label></th>
+            <th> </th>
+        </tr>
+        <tr>
+            <td><input type="number" step="0.01" name="monto_total" id="monto_total" class="form-control" required readonly></td>
+            <td></td>
+        </tr>
+    </table>
+    <h3 align="center">Detalles de la Compra</h3>
+    <table class="table" id="detalles-compra-table">
+        <thead>
+            <tr>
+                <th>Insumo</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody id="detalles-body">
+            <tr>
+                <td>
+                    <select name="id_insumo[]" class="form-control" required>
+                        {% for insumo in insumos %}
+                            <option value="{{ insumo.id_insumo }}">{{ insumo.nombre_insumo }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td><input type="number" name="cantidad[]" class="form-control cantidad" required oninput="calcularSubtotal()"></td>
+                <td><input type="number" step="0.01" name="precio_unitario[]" class="form-control precio_unitario" required oninput="calcularSubtotal()"></td>
+                <td><input type="number" step="0.01" name="subtotal[]" class="form-control subtotal" readonly></td>
+                <td><button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button></td>
+            </tr>
+        </tbody>
+    </table>  
+</br> 
+    <div class="actions mt-3" align="center">
+        <button type="button" class="btn btn-secondary" onclick="agregarFila()">Agregar Insumo</button>
+        <button type="submit" class="btn btn-primary">Registrar Compra</button>
+        <button type="reset" class="btn btn-danger">Cancelar</button>
+    </div>
+</form>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function agregarFila() {
+        const tabla = document.getElementById('detalles-body');
+        const filaId = `fila_${Date.now()}`; 
+        const fila = tabla.insertRow();
+
+        fila.innerHTML = `
+            <td>
+                <select name="id_insumo[]" class="form-control" required>
+                    {% for insumo in insumos %}
+                        <option value="{{ insumo.id_insumo }}">{{ insumo.nombre_insumo }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td><input type="number" name="cantidad[]" class="form-control cantidad" required oninput="calcularSubtotal()"></td>
+            <td><input type="number" step="0.01" name="precio_unitario[]" class="form-control precio_unitario" required oninput="calcularSubtotal()"></td>
+            <td><input type="number" step="0.01" name="subtotal[]" class="form-control subtotal" readonly></td>
+            <td><button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button></td>
+        `;
+    }
+    
+    function eliminarFila(button) {
+        const row = button.closest('tr');
+        const table = document.getElementById('detalles-body');
+        
+        if (table.rows.length > 1) {
+            row.remove();
+            calcularSubtotal();
+        } else {
+            alert('Debe haber al menos un insumo en la solicitud.');
+        }
+    }    
+
+    function calcularSubtotal() {
+        var filas = document.querySelectorAll("#detalles-body tr");
+        var montoTotal = 0;
+
+        filas.forEach(function(fila) {
+            var cantidad = parseFloat(fila.querySelector(".cantidad").value) || 0;
+            var precioUnitario = parseFloat(fila.querySelector(".precio_unitario").value) || 0;
+            var subtotal = cantidad * precioUnitario;
+            fila.querySelector(".subtotal").value = subtotal.toFixed(2); 
+
+            montoTotal += subtotal; 
+        });
+
+        document.getElementById("monto_total").value = montoTotal.toFixed(2);
+    }
+</script>
+<script>
+    const now = new Date();
+    const fechaHora = document.getElementById('fecha_hora');
+    const formattedDateTime = now.toISOString().slice(0, 16);
+    fechaHora.value = formattedDateTime;
+</script>
+{% if messages %}
+  <div class="alert alert-dismissible fade show" role="alert">
+      {% for message in messages %}
+          <div class="alert {{ message.tags }}">
+              {{ message }}
+          </div>
+      {% endfor %}
+  </div>
+{% endif %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const alert = document.querySelector('.alert');
+        if (alert) {
+            setTimeout(function() {
+                alert.classList.remove('show'); 
+            }, 5000); 
+        }
+    });
+</script>
+{% endblock %}

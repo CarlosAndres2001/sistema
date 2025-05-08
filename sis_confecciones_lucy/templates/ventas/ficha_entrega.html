@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Registro de Pedidos Entregados
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Registrar Ficha de Entrega</h2>
+    <form method="POST" action="{% url 'ventas_entrega' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="id_usuario" class="form-label">Usuario:</label>
+            <select class="form-select" id="id_usuario" name="id_usuario" required>
+                <option value="">Seleccione un usuario</option>
+                {% for usuario in usuarios %}
+                    <option value="{{ usuario.id }}">{{ usuario.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="fecha_hora" class="form-label">Fecha y Hora:</label>
+            <input type="datetime-local" class="form-control" id="fecha_hora" name="fecha_hora" required>
+        </div>
+        <div class="mb-3">
+            <label for="id_pedido" class="form-label">Pedido:</label>
+            <select class="form-select" id="id_pedido" name="id_pedido" required>
+                <option value="">Seleccione un pedido</option>
+                {% for pedido in pedidos %}
+                    <option value="{{ pedido.id }}">{{ pedido.detalle }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="estado" class="form-label">Estado:</label>
+            <input type="text" class="form-control" id="estado" name="estado" placeholder="Ejemplo: Activo/Inactivo" maxlength="25">
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+</div>
+{% endblock %}

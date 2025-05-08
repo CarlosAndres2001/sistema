@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Registrar Venta
+{% endblock %}
+
+{% block content %}
+<h1 class="text-center">Registro de Compra de Divisas</h1>
+<form method="post" class="mt-4">
+    {% csrf_token %}
+    <input type="hidden" display="none" name="id_usuario" value="{{ request.user.id_usuario }}">
+    <table class="table">
+        <tr>
+            <th><label for="fecha_hora">Fecha y Hora:</label></th>
+        </tr>
+        <tr>
+            <td>
+                <input type="datetime-local" name="fecha_hora" id="fecha_hora" class="form-control text-center" required>
+            </td>
+        </tr>
+        <tr>
+            <th colspan="2">Detalle de Cortes</th>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <table class="table table-bordered" style="width: 100%;">
+                    <tr>
+                        <th>Billetes de 100</th>
+                        <th>billetes de 50</th>
+                        <th>Billetes de 20</th>
+                        <th>Billetes de 10</th>
+                        <th>Billetes de 5</th>
+                        <th>Billetes de 1</th>
+                    </tr>
+                    <tr>
+                        <td><input type="number" name="corte_100" id="corte_100" class="form-control corte-input" min="0" value="0" onfocus="this.select()"></td>
+                        <td><input type="number" name="corte_50" id="corte_50" class="form-control corte-input" min="0" value="0" onfocus="this.select()"></td>
+                        <td><input type="number" name="corte_20" id="corte_20" class="form-control corte-input" min="0" value="0" onfocus="this.select()"></td>
+                        <td><input type="number" name="corte_10" id="corte_10" class="form-control corte-input" min="0" value="0" onfocus="this.select()"></td>
+                        <td><input type="number" name="corte_5" id="corte_5" class="form-control corte-input" min="0" value="0" onfocus="this.select()"></td>
+                        <td><input type="number" name="corte_1" id="corte_1" class="form-control corte-input" min="0" value="0" onfocus="this.select()"></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="total_calculado">Monto Total:</label></th>
+        </tr>
+        <tr>
+            <td>
+                <input type="number" required =!"0" step="0.01" name="total_calculado" id="total_calculado" class="form-control text-center" value="0" readonly>
+            </td>
+        </tr>
+    </table>
+    <div id="mensaje-error-js" class="alert alert-danger d-none mt-3" role="alert"></div>
+    <div class="actions mt-3" align="center">
+        <button type="submit" class="btn btn-primary">Registrar Compra</button>
+        <button type="reset" class="btn btn-danger">Cancelar</button>
+    </div>
+ {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+ {% endif %}
+ <script> 
+    document.addEventListener("DOMContentLoaded", function() {    
+        const alert = document.querySelector('.alert');
+        if (alert) {
+            setTimeout(function() {
+                alert.classList.remove('show'); 
+            }, 5000); 
+        }
+    });
+ </script>
+ <script>
+ document.addEventListener("DOMContentLoaded", function () {
+    const ahora = new Date();
+    const offset = ahora.getTimezoneOffset() * 60000;
+    const fechaLocal = new Date(ahora.getTime() - offset);
+    document.getElementById('fecha_hora').value = fechaLocal.toISOString().slice(0, 16);
+
+    function calcularMontoTotal() {
+        const cortes = {
+            100: parseInt(document.getElementById('corte_100').value) || 0,
+            50: parseInt(document.getElementById('corte_50').value) || 0,
+            20: parseInt(document.getElementById('corte_20').value) || 0,
+            10: parseInt(document.getElementById('corte_10').value) || 0,
+            5: parseInt(document.getElementById('corte_5').value) || 0,
+            1: parseInt(document.getElementById('corte_1').value) || 0
+        };
+
+        let subtotal = 0;
+        for (const [valor, cantidad] of Object.entries(cortes)) {
+            subtotal += cantidad * valor;
+        }
+
+        document.getElementById('total_calculado').value = subtotal;
+    }
+
+    document.querySelectorAll('.corte-input').forEach(input => {
+        input.addEventListener('input', calcularMontoTotal);
+    });
+
+    document.querySelector('form').addEventListener('submit', function (e) {
+        const total = parseFloat(document.getElementById('total_calculado').value) || 0;
+        const mensaje = document.getElementById('mensaje-error-js');
+
+        mensaje.classList.add('d-none');
+        mensaje.textContent = '';
+
+        if (total <= 0) {
+            e.preventDefault();
+            mensaje.textContent = 'Debe ingresar al menos un corte con cantidad mayor a 0';
+            mensaje.classList.remove('d-none');
+
+            setTimeout(() => {
+                mensaje.classList.add('d-none');
+                mensaje.textContent = '';
+            }, 4000);
+        }
+    });
+
+    const alert = document.querySelector('.alert');
+    if (alert) {
+        setTimeout(() => {
+            alert.classList.remove('show');
+        }, 5000);
+    }
+  });
+ </script>
+</form>
+<script> 
+    document.addEventListener("DOMContentLoaded", function() {    
+        const alert = document.querySelector('.alert');
+        if (alert) {
+            setTimeout(function() {
+                alert.classList.remove('show'); 
+            }, 5000); 
+        }
+    });
+</script>
+{% endblock %}

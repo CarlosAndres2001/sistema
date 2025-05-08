@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<h2 class="mt-5" align="center">Categorías Existentes</h2>
+<ul class="list-group" align="center">
+    {% for categoria in categorias %}
+    <li class="list-group-item">
+        {{ categoria.nombre_categoria }}
+    </li>
+    {% empty %}
+    <li class="list-group-item text-muted">No hay categorías creadas aún.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

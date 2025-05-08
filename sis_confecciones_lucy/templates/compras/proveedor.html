@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+  <h1 class="text-center">Registrar Proveedor</h1>
+  <form action="{% url 'crear_proveedor' %}" method="post" class="mt-4">
+
+    {% csrf_token %}
+    <table>
+        <tr>
+            <th><label for="nombre">Nombre / Razón Social:</label></th>
+            <th><label for="direccion">Dirección:</label></th>
+            <th><label for="telefono">Teléfono:</label></th>
+        </tr>
+        <tr>
+            <td><input type="text" name="nombre" id="nombre" class="form-control" placeholder="Nombre"></td>
+            <td><input type="text" name="direccion" id="direccion" class="form-control" placeholder="direccion"></td>
+            <td><input type="text" name="telefono" id="telefono" class="form-control" placeholder="Teléfono"></td>
+        </tr>
+    </table>
+    <div class="text-center mt-4">
+      <button type="submit" class="btn btn-primary">Registrar</button>
+      <button type="reset" class="btn btn-secondary">Cancelar</button>
+    </div>
+  </form>
+</div>
+{% if messages %}
+    <div class="alert alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+<script>
+        
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        const alert = document.querySelector('.alert');
+
+        
+        if (alert) {
+            setTimeout(function() {
+                alert.classList.remove('show'); 
+            }, 5000); 
+        }
+    });
+</script>
+{% endblock %}

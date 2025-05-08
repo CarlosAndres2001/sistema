@@ -1,0 +1,118 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.form-container {
+    width: 60%;
+    margin: auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2 {
+    color: #333;
+}
+
+.section {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+table {
+    width: 100%;
+    margin-bottom: 20px;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+button#cancelar {
+    background-color: #dc3545;
+}
+
+button#cancelar:hover {
+    background-color: #c82333;
+}
+
+.notification {
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 20px;
+    color: white;
+    font-size: 16px;
+    display: none;
+    text-align: center;
+}
+
+.success {
+    background-color: #28a745;
+}
+
+.error {
+    background-color: #dc3545;
+}
+
+.notification.show {
+    display: block;
+}
+.is-invalid {
+    border: 1px solid red;
+    background-color: #f8d7da;
+}
+.mensaje-error {
+    margin-top: 10px;
+    color: red;
+}
+.modal-content {
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.alert {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    }
+.alert.success {
+    background-color: #28a745;
+    color: white;
+    }
+.alert.error {
+    background-color: #dc3545;
+    color: white;}
+
